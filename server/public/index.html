@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CT295 - Hệ Thống Điểm Danh & Ghi Danh IoT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-eager-green: #58cc02;
+      --color-storybook-green: #d7ffb8;
+      --color-spark-blue: #1cb0f6;
+      --color-fresh-leaf: #a5ed6e;
+      --color-night-ink: #000437;
+      --color-paper-white: #ffffff;
+      --color-charcoal: #4b4b4b;
+      --color-pencil-gray: #777777;
+      --color-faded-gray: #e5e5e5;
+      --color-border: #e5e5e5;
+      --color-shadow: #d4d4d4;
+      --color-danger: #ff4b4b;
+      --color-warning: #ff9600;
+      --radius-default: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f7f7f7;
+      color: var(--color-charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--color-paper-white);
+      border-bottom: 2px solid var(--color-faded-gray);
+      padding: 16px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--color-eager-green);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 24px;
+      box-shadow: 0 4px 0 #46a302;
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-charcoal);
+      line-height: 1.2;
+    }
+
+    .logo-text p {
+      font-size: 13px;
+      color: var(--color-pencil-gray);
+      font-weight: 700;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-storybook-green);
+      color: #3b8700;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 2px solid #b8f089;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--color-eager-green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(88, 204, 2, 0.4);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 0 24px;
+      flex: 1;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--color-faded-gray);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--color-pencil-gray);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-btn:hover {
+      background-color: var(--color-faded-gray);
+      color: var(--color-charcoal);
+    }
+
+    .tab-btn.active {
+      background: var(--color-storybook-green);
+      color: #3b8700;
+      border: 2px solid #a5ed6e;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+    }
+
+    .btn-primary {
+      background-color: var(--color-eager-green);
+      color: #fff;
+      box-shadow: 0 4px 0 #46a302;
+    }
+
+    .btn-primary:active {
+      box-shadow: 0 2px 0 #46a302;
+    }
+
+    .btn-secondary {
+      background-color: #fff;
+      color: var(--color-spark-blue);
+      border: 2px solid var(--color-border);
+      box-shadow: 0 4px 0 var(--color-shadow);
+    }
+
+    .btn-secondary:active {
+      box-shadow: 0 2px 0 var(--color-shadow);
+    }
+
+    .btn-warning {
+      background-color: var(--color-warning);
+      color: #fff;
+      box-shadow: 0 4px 0 #cc7800;
+    }
+
+    .btn-warning:active {
+      box-shadow: 0 2px 0 #cc7800;
+    }
+
+    .btn-danger {
+      background-color: var(--color-danger);
+      color: #fff;
+      box-shadow: 0 4px 0 #d93838;
+    }
+
+    .btn-danger:active {
+      box-shadow: 0 2px 0 #d93838;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    }
+
+    .card {
+      background: var(--color-paper-white);
+      border-radius: var(--radius-default);
+      border: 2px solid var(--color-border);
+      box-shadow: 0 4px 0 var(--color-shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 0 var(--color-shadow);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--color-pencil-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--color-charcoal);
+    }
+
+    .stat-card.highlight {
+      background: #f7ffef;
+      border-color: #a5ed6e;
+    }
+
+    .stat-card.highlight .stat-value {
+      color: var(--color-eager-green);
+    }
+
+    .enroll-banner {
+      background: #fff8e8;
+      border: 2px solid #ffd577;
+      border-radius: var(--radius-default);
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 0 #ffe099;
+    }
+
+    .enroll-banner.active {
+      background: #eef9ff;
+      border-color: var(--color-spark-blue);
+      box-shadow: 0 4px 0 #b3e3fc;
+    }
+
+    .enroll-info h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .enroll-info p {
+      font-size: 14px;
+      color: var(--color-pencil-gray);
+      font-weight: 600;
+    }
+
+    .live-alert {
+      display: none;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.06);
+      animation: alertPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes alertPop {
+      0% { transform: scale(0.97); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: #fafafa;
+      color: var(--color-charcoal);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    td {
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-charcoal);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr.recent-flash {
+      background-color: var(--color-storybook-green) !important;
+      animation: highlightFlash 3s ease forwards;
+    }
+
+    @keyframes highlightFlash {
+      0% { background-color: var(--color-storybook-green); }
+      70% { background-color: var(--color-storybook-green); }
+      100% { background-color: transparent; }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge-success {
+      background: var(--color-storybook-green);
+      color: #3b8700;
+      border: 1px solid #a5ed6e;
+    }
+
+    .badge-danger {
+      background: #ffe5e5;
+      color: var(--color-danger);
+      border: 1px solid #ffb8b8;
+    }
+
+    .badge-uid {
+      background: #f0f0f0;
+      color: #333;
+      font-family: monospace;
+      font-size: 13px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 4, 55, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: var(--radius-default);
+      width: 100%;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+      border: 2px solid var(--color-border);
+      animation: modalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(20px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--color-charcoal);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-charcoal);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-control:focus {
+      border-color: var(--color-spark-blue);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .rfid-scan-hint {
+      background: #f7ffef;
+      border: 2px dashed var(--color-eager-green);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #3b8700;
+    }
+
+    .rfid-scan-hint.scanned {
+      background: var(--color-storybook-green);
+      border-style: solid;
+      animation: bounce 0.4s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--color-pencil-gray);
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo-badge">
+        <div class="logo-icon">IoT</div>
+        <div class="logo-text">
+          <h1>Hệ Thống Điểm Danh & Ghi Danh NFC/RFID</h1>
+          <p>Môn học CT295 - Nhóm IoT & Hệ Thống Nhúng</p>
+        </div>
+      </div>
+      <div class="connection-status" id="connectionBadge">
+        <span class="status-dot"></span>
+        <span id="connectionText">Đang kết nối Server...</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="enroll-banner" id="enrollBanner">
+      <div class="enroll-info">
+        <h3 id="enrollBannerTitle">Chế Độ Ghi Danh Thẻ Mới (Enrollment Mode)</h3>
+        <p id="enrollBannerDesc">Bật chế độ này và quẹt thẻ NFC/RFID bất kỳ lên ESP32 để tự động bắt mã UID và đăng ký sinh viên.</p>
+      </div>
+      <button class="btn btn-warning" id="toggleEnrollBtn" onclick="toggleEnrollMode()">
+        Bật Chế Độ Ghi Danh
+      </button>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-attendance', this)">Log Điểm Danh Realtime</button>
+      <button class="tab-btn" onclick="switchTab('tab-students', this)">Danh Sách Sinh Viên</button>
+      <button class="tab-btn" onclick="switchTab('tab-reports', this)">Báo Cáo & Thống Kê</button>
+    </div>
+
+    <!-- TAB 1: ATTENDANCE REALTIME -->
+    <div id="tab-attendance">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Tổng Sinh Viên</span>
+          <span class="stat-value" id="statTotalStudents">0</span>
+        </div>
+        <div class="stat-card highlight">
+          <span class="stat-label">Đã Điểm Danh Hôm Nay</span>
+          <span class="stat-value" id="statTodayChecked">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Vắng Mặt</span>
+          <span class="stat-value" id="statTodayAbsent">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Lượt Quẹt Hôm Nay</span>
+          <span class="stat-value" id="statTotalLogs">0</span>
+        </div>
+      </div>
+
+      <div class="live-alert" id="liveScanAlert"></div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 18px; font-weight: 800;">Lịch Sử Quẹt Thẻ Trực Tiếp</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadAttendanceLogs()">Làm Mới</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Thời Gian</th>
+                <th>Mã Thẻ (UID)</th>
+                <th>MSSV</th>
+                <th>Họ Và Tên</th>
+                <th>Lớp</th>
+                <th>Kết Quả</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <p>Đang tải dữ liệu điểm danh...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: STUDENTS MANAGEMENT -->
+    <div id="tab-students" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 18px; font-weight: 800;">Danh Sách Sinh Viên Đã Gán Thẻ</h2>
+          <button class="btn btn-primary" onclick="openStudentModal()">+ Đăng Ký Sinh Viên Mới</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>MSSV</th>
+                <th>Họ Và Tên Lót</th>
+                <th>Tên</th>
+                <th>Lớp</th>
+                <th>UID Thẻ NFC/RFID</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <tr>
+                <td colspan="7" class="empty-state">
+                  <p>Đang tải danh sách sinh viên...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: REPORTS & EXPORT -->
+    <div id="tab-reports" style="display: none;">
+      <div class="card">
+        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Xuất Báo Cáo Điểm Danh (Excel)</h2>
+        <p style="color: var(--color-pencil-gray); font-weight: 600; margin-bottom: 20px;">
+          Hệ thống sẽ tổng hợp toàn bộ lượt quẹt thẻ, thông tin sinh viên, ngày giờ để xuất ra file định dạng Excel .xlsx chính thức.
+        </p>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <div>
+            <label style="font-size: 12px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px;">Chọn Ngày Báo Cáo:</label>
+            <input type="date" id="exportDateInput" class="form-control" style="width: auto;">
+          </div>
+          <button class="btn btn-primary" style="margin-top: 18px;" onclick="exportExcel()">
+            Tải File Excel (.xlsx)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT STUDENT -->
+  <div class="modal-backdrop" id="studentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTitle">Đăng Ký Sinh Viên & Gán Thẻ</h2>
+        <button onclick="closeStudentModal()" style="border: none; background: none; font-size: 20px; font-weight: 800; cursor: pointer; color: var(--color-pencil-gray);">&times;</button>
+      </div>
+
+      <div class="rfid-scan-hint" id="rfidHint">
+        Quẹt thẻ NFC/RFID vào thiết bị ESP32 để tự động bắt mã UID...
+      </div>
+
+      <form id="studentForm" onsubmit="saveStudent(event)">
+        <input type="hidden" id="studentId">
+        <div class="form-group">
+          <label>Mã UID Thẻ NFC/RFID *</label>
+          <input type="text" id="formUid" class="form-control" placeholder="Ví dụ: 7BA52C54" required>
+        </div>
+        <div class="form-group">
+          <label>Mã Số Sinh Viên (MSSV) *</label>
+          <input type="text" id="formMssv" class="form-control" placeholder="Ví dụ: B2303828" required>
+        </div>
+        <div class="form-group">
+          <label>Họ Và Tên Lót *</label>
+          <input type="text" id="formHoLot" class="form-control" placeholder="Ví dụ: Nguyen Phuoc" required>
+        </div>
+        <div class="form-group">
+          <label>Tên *</label>
+          <input type="text" id="formTen" class="form-control" placeholder="Ví dụ: Loc" required>
+        </div>
+        <div class="form-group">
+          <label>Lớp Học</label>
+          <input type="text" id="formLop" class="form-control" placeholder="Ví dụ: DI2396A1" value="DI2396A1">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu Sinh Viên</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let isEnrollMode = false;
+    let studentsCache = [];
+    let highestLogId = 0;
+    let lastHandledEnrollScanTime = 0;
+    let eventSource = null;
+
+    function playNotificationSound(success = true) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(success ? 880 : 350, ctx.currentTime);
+        if (success) {
+          osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
+        }
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.22);
+      } catch (e) {}
+    }
+
+    function showLiveScanAlert(log) {
+      const alertBox = document.getElementById('liveScanAlert');
+      if (!alertBox) return;
+      alertBox.style.display = 'block';
+
+      if (log.status === 'SUCCESS') {
+        alertBox.style.background = 'var(--color-storybook-green)';
+        alertBox.style.border = '2px solid #a5ed6e';
+        alertBox.style.color = '#1b6300';
+        alertBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:16px;">✓ ĐIỂM DANH THÀNH CÔNG:</strong> 
+              <span style="font-size:16px; margin-left: 8px;"><strong>${log.mssv || ''}</strong> - ${log.hoLot || ''} ${log.ten || ''} (${log.lop || 'DI2396A1'})</span>
+            </div>
+            <span style="font-size:13px; font-weight:800; background:rgba(0,0,0,0.06); padding:4px 8px; border-radius:6px;">${log.timestamp}</span>
+          </div>
+        `;
+        playNotificationSound(true);
+      } else {
+        alertBox.style.background = '#ffe5e5';
+        alertBox.style.border = '2px solid #ffb8b8';
+        alertBox.style.color = '#c91e1e';
+        alertBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:16px;">✕ THẺ CHƯA ĐĂNG KÝ:</strong> 
+              <span style="font-size:16px; margin-left: 8px;">Mã UID: <code>${log.scanned_uid}</code></span>
+            </div>
+            <span style="font-size:13px; font-weight:800; background:rgba(0,0,0,0.06); padding:4px 8px; border-radius:6px;">${log.timestamp}</span>
+          </div>
+        `;
+        playNotificationSound(false);
+      }
+    }
+
+    function insertAttendanceRow(log, isLive = false) {
+      if (log.id && log.id > highestLogId) {
+        highestLogId = log.id;
+      }
+      if (document.getElementById(`log-row-${log.id}`)) return;
+
+      const tbody = document.getElementById('attendanceTableBody');
+      const emptyState = tbody.querySelector('.empty-state');
+      if (emptyState) tbody.innerHTML = '';
+
+      const newRow = document.createElement('tr');
+      newRow.id = `log-row-${log.id}`;
+      if (isLive) newRow.className = 'recent-flash';
+      newRow.innerHTML = `
+        <td>${log.timestamp}</td>
+        <td><span class="badge badge-uid">${log.scanned_uid}</span></td>
+        <td>${log.mssv || '—'}</td>
+        <td>${log.hoLot ? log.hoLot + ' ' + (log.ten || '') : 'Thẻ lạ (Chưa gán)'}</td>
+        <td>${log.lop || '—'}</td>
+        <td>
+          ${log.status === 'SUCCESS' 
+            ? '<span class="badge badge-success">Điểm Danh Hợp Lệ</span>' 
+            : '<span class="badge badge-danger">Từ Chối Truy Cập</span>'}
+        </td>
+      `;
+
+      tbody.insertBefore(newRow, tbody.firstChild);
+
+      if (isLive) {
+        showLiveScanAlert(log);
+      }
+    }
+
+    function switchTab(tabId, element) {
+      document.getElementById('tab-attendance').style.display = 'none';
+      document.getElementById('tab-students').style.display = 'none';
+      document.getElementById('tab-reports').style.display = 'none';
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).style.display = 'block';
+      element.classList.add('active');
+
+      if (tabId === 'tab-students') loadStudents();
+      if (tabId === 'tab-attendance') {
+        loadAttendanceLogs();
+        loadStats();
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/attendance/stats');
+        const data = await res.json();
+        document.getElementById('statTotalStudents').textContent = data.totalStudents;
+        document.getElementById('statTodayChecked').textContent = data.todayChecked;
+        document.getElementById('statTodayAbsent').textContent = data.todayAbsent;
+        document.getElementById('statTotalLogs').textContent = data.totalLogs;
+      } catch (err) {}
+    }
+
+    async function loadAttendanceLogs() {
+      try {
+        const res = await fetch('/api/attendance/logs');
+        const logs = await res.json();
+        const tbody = document.getElementById('attendanceTableBody');
+        if (!logs.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><p>Chưa có lượt quẹt thẻ nào.</p></td></tr>`;
+          return;
+        }
+
+        logs.forEach(l => {
+          if (l.id && l.id > highestLogId) highestLogId = l.id;
+        });
+
+        tbody.innerHTML = logs.map(l => `
+          <tr id="log-row-${l.id}">
+            <td>${l.timestamp}</td>
+            <td><span class="badge badge-uid">${l.scanned_uid}</span></td>
+            <td>${l.mssv || '—'}</td>
+            <td>${l.hoLot ? l.hoLot + ' ' + (l.ten || '') : 'Thẻ lạ (Chưa gán)'}</td>
+            <td>${l.lop || '—'}</td>
+            <td>
+              ${l.status === 'SUCCESS' 
+                ? '<span class="badge badge-success">Điểm Danh Hợp Lệ</span>' 
+                : '<span class="badge badge-danger">Từ Chối Truy Cập</span>'}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {}
+    }
+
+    async function loadStudents() {
+      try {
+        const res = await fetch('/api/students');
+        studentsCache = await res.json();
+        const tbody = document.getElementById('studentsTableBody');
+        if (!studentsCache.length) {
+          tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><p>Chưa có sinh viên nào trong hệ thống.</p></td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = studentsCache.map((s, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td><strong>${s.mssv}</strong></td>
+            <td>${s.hoLot}</td>
+            <td><strong>${s.ten}</strong></td>
+            <td>${s.lop}</td>
+            <td><span class="badge badge-uid">${s.uid}</span></td>
+            <td>
+              <button class="btn btn-secondary btn-sm" onclick="editStudent(${s.id})">Sửa</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Xóa</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {}
+    }
+
+    async function toggleEnrollMode() {
+      try {
+        const res = await fetch('/api/system/mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enrollMode: !isEnrollMode })
+        });
+        const data = await res.json();
+        updateEnrollBanner(data.enrollMode);
+      } catch (err) {}
+    }
+
+    function updateEnrollBanner(active) {
+      isEnrollMode = active;
+      const banner = document.getElementById('enrollBanner');
+      const title = document.getElementById('enrollBannerTitle');
+      const desc = document.getElementById('enrollBannerDesc');
+      const btn = document.getElementById('toggleEnrollBtn');
+
+      if (active) {
+        banner.classList.add('active');
+        title.textContent = 'CHẾ ĐỘ GHI DANH ĐANG BẬT!';
+        desc.textContent = 'Hãy đưa thẻ NFC/RFID bất kỳ vào ESP32, hệ thống sẽ mở form đăng ký ngay lập tức.';
+        btn.textContent = 'Tắt Chế Độ Ghi Danh';
+        btn.className = 'btn btn-danger';
+      } else {
+        banner.classList.remove('active');
+        title.textContent = 'Chế Độ Ghi Danh Thẻ Mới (Enrollment Mode)';
+        desc.textContent = 'Bật chế độ này và quẹt thẻ NFC/RFID bất kỳ lên ESP32 để tự động bắt mã UID và đăng ký sinh viên.';
+        btn.textContent = 'Bật Chế Độ Ghi Danh';
+        btn.className = 'btn btn-warning';
+      }
+    }
+
+    function openStudentModal(uid = '') {
+      document.getElementById('studentId').value = '';
+      document.getElementById('studentForm').reset();
+      document.getElementById('formLop').value = 'DI2396A1';
+      document.getElementById('modalTitle').textContent = 'Đăng Ký Sinh Viên & Gán Thẻ';
+      
+      const hint = document.getElementById('rfidHint');
+      if (uid) {
+        document.getElementById('formUid').value = uid;
+        hint.classList.add('scanned');
+        hint.textContent = `Đã nhận diện mã thẻ NFC: ${uid}! Hãy điền thông tin sinh viên bên dưới.`;
+        playNotificationSound(true);
+      } else {
+        hint.classList.remove('scanned');
+        hint.textContent = 'Quẹt thẻ NFC/RFID vào thiết bị ESP32 để tự động bắt mã UID...';
+      }
+
+      document.getElementById('studentModal').classList.add('open');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('studentModal').classList.remove('open');
+    }
+
+    function editStudent(id) {
+      const s = studentsCache.find(item => item.id === id);
+      if (!s) return;
+      document.getElementById('studentId').value = s.id;
+      document.getElementById('formUid').value = s.uid;
+      document.getElementById('formMssv').value = s.mssv;
+      document.getElementById('formHoLot').value = s.hoLot;
+      document.getElementById('formTen').value = s.ten;
+      document.getElementById('formLop').value = s.lop;
+      document.getElementById('modalTitle').textContent = 'Chỉnh Sửa Thông Tin Sinh Viên';
+      document.getElementById('rfidHint').textContent = 'Bạn có thể quẹt thẻ mới để đổi UID hoặc cập nhật thông tin.';
+      document.getElementById('studentModal').classList.add('open');
+    }
+
+    async function deleteStudent(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa sinh viên này khỏi hệ thống?')) return;
+      try {
+        await fetch(`/api/students/${id}`, { method: 'DELETE' });
+        loadStudents();
+        loadStats();
+      } catch (err) {}
+    }
+
+    async function saveStudent(e) {
+      e.preventDefault();
+      const id = document.getElementById('studentId').value;
+      const payload = {
+        uid: document.getElementById('formUid').value,
+        mssv: document.getElementById('formMssv').value,
+        hoLot: document.getElementById('formHoLot').value,
+        ten: document.getElementById('formTen').value,
+        lop: document.getElementById('formLop').value
+      };
+
+      try {
+        const url = id ? `/api/students/${id}` : '/api/students';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert('Lỗi: ' + (err.error || 'Không thể lưu sinh viên'));
+          return;
+        }
+
+        closeStudentModal();
+        loadStudents();
+        loadStats();
+      } catch (err) {
+        alert('Lỗi mạng khi lưu sinh viên');
+      }
+    }
+
+    function exportExcel() {
+      const date = document.getElementById('exportDateInput').value;
+      const url = date ? `/api/attendance/export?date=${date}` : '/api/attendance/export';
+      window.open(url, '_blank');
+    }
+
+    function setupSSE() {
+      if (eventSource) {
+        try { eventSource.close(); } catch (e) {}
+      }
+      eventSource = new EventSource('/api/events');
+
+      eventSource.addEventListener('connected', (e) => {
+        const data = JSON.parse(e.data);
+        document.getElementById('connectionBadge').style.background = 'var(--color-storybook-green)';
+        document.getElementById('connectionBadge').style.borderColor = '#b8f089';
+        document.getElementById('connectionText').textContent = 'Hệ Thống Trực Tuyến (Realtime)';
+        updateEnrollBanner(data.enrollMode);
+      });
+
+      eventSource.addEventListener('mode_changed', (e) => {
+        const data = JSON.parse(e.data);
+        updateEnrollBanner(data.enrollMode);
+      });
+
+      eventSource.addEventListener('card_scanned_enroll', (e) => {
+        const data = JSON.parse(e.data);
+        lastHandledEnrollScanTime = Date.now();
+        openStudentModal(data.uid);
+      });
+
+      eventSource.addEventListener('attendance_updated', (e) => {
+        const log = JSON.parse(e.data);
+        insertAttendanceRow(log, true);
+        loadStats();
+      });
+
+      eventSource.onerror = () => {
+        document.getElementById('connectionBadge').style.background = '#ffe5e5';
+        document.getElementById('connectionBadge').style.borderColor = '#ffb8b8';
+        document.getElementById('connectionText').textContent = 'Đang tự động kết nối lại...';
+        setTimeout(setupSSE, 2500);
+      };
+    }
+
+    // Auto-sync fail-safe loop: runs every 1000ms
+    async function runAutoSync() {
+      try {
+        const res = await fetch(`/api/attendance/latest?since=${highestLogId}`);
+        if (res.ok) {
+          const newLogs = await res.json();
+          if (newLogs && newLogs.length > 0) {
+            newLogs.forEach(l => insertAttendanceRow(l, true));
+            loadStats();
+          }
+        }
+
+        if (isEnrollMode) {
+          const enrollRes = await fetch('/api/system/enroll-scan');
+          if (enrollRes.ok) {
+            const { scan } = await enrollRes.json();
+            if (scan && scan.timestamp > lastHandledEnrollScanTime) {
+              lastHandledEnrollScanTime = scan.timestamp;
+              openStudentModal(scan.uid);
+              fetch('/api/system/enroll-scan/clear', { method: 'POST' });
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('exportDateInput').value = new Date().toISOString().split('T')[0];
+      loadStats();
+      loadAttendanceLogs();
+      setupSSE();
+      setInterval(runAutoSync, 1000);
+    });
+  </script>
+</body>
+</html>

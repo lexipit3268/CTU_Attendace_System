@@ -1,0 +1,100 @@
+TỔNG HỢP SƠ ĐỒ MẠCH IOT SỬ DỤNG ESP32 VÀ RFID RC522
+
+1. Danh sách linh kiện
+
+1. ESP32 DevKit V1: Bộ điều khiển trung tâm.
+2. RFID RC522: Module đọc thẻ RFID tần số 13.56 MHz.
+3. LCD 16x2 I2C: Màn hình hiển thị thông tin.
+4. Buzzer: Còi phát âm thanh cảnh báo.
+5. LED đỏ: Đèn báo trạng thái hoạt động.
+6. Điện trở 220–330Ω: Điện trở hạn dòng cho LED.
+7. Breadboard: Bảng mạch thử nghiệm.
+8. Dây jumper: Dây kết nối các linh kiện.
+
+2. Sơ đồ kết nối ESP32 với các linh kiện
+
+2.1. ESP32 với RFID RC522
+
+Chân RC522 Chân ESP32
+SDA / SS GPIO 5
+SCK GPIO 18
+MOSI GPIO 23
+MISO GPIO 19
+RST GPIO 4
+IRQ Không kết nối
+3.3V 3V3
+GND GND
+
+Lưu ý: Module RC522 sử dụng nguồn 3.3V, không cấp trực tiếp 5V.
+
+2.2. ESP32 với LCD 16x2 I2C
+
+Chân LCD Chân ESP32
+GND GND
+VCC 3.3V hoặc 5V tùy module
+SDA GPIO 21
+SCL GPIO 22
+
+Lưu ý: Nếu LCD sử dụng nguồn 5V, cần kiểm tra mức điện áp tín hiệu SDA và SCL. Nên sử dụng bộ chuyển mức logic nếu cần thiết để bảo vệ ESP32.
+
+2.3. ESP32 với Buzzer
+
+Chân Buzzer Kết nối
+Chân (+) GPIO 25
+Chân (-) GND
+
+Buzzer được sử dụng để phát âm thanh thông báo khi quét thẻ RFID.
+
+2.4. ESP32 với LED đỏ
+
+Thành phần Kết nối
+GPIO 26 Điện trở 220–330Ω
+Điện trở Chân dài LED (+)
+Chân ngắn LED (-) GND
+
+LED được sử dụng để hiển thị trạng thái hoạt động của hệ thống.
+
+3. Bảng tổng hợp chân GPIO
+
+Thiết bị Chức năng GPIO ESP32
+RC522 SDA / SS GPIO 5
+RC522 SCK GPIO 18
+RC522 MOSI GPIO 23
+RC522 MISO GPIO 19
+RC522 RST GPIO 4
+LCD SDA GPIO 21
+LCD SCL GPIO 22
+Buzzer Signal GPIO 25
+LED Signal GPIO 26
+
+4. Nguyên lý hoạt động của hệ thống
+
+1. Hệ thống được cấp nguồn và ESP32 bắt đầu khởi tạo các module.
+2. Module RFID RC522 liên tục chờ thẻ RFID được đưa đến gần.
+3. Khi người dùng đưa thẻ đến gần, RC522 đọc mã UID của thẻ.
+4. ESP32 tiếp nhận mã UID và tiến hành kiểm tra tính hợp lệ.
+5. Nếu UID hợp lệ:
+    * LCD hiển thị thông báo truy cập thành công.
+    * LED sáng để báo hiệu.
+    * Buzzer phát âm thanh xác nhận.
+6. Nếu UID không hợp lệ:
+    * LCD hiển thị thông báo truy cập bị từ chối.
+    * LED có thể tắt hoặc nháy tùy chương trình.
+    * Buzzer phát âm thanh cảnh báo.
+
+5. Nguyên tắc cấp nguồn và lưu ý khi lắp đặt
+
+* ESP32 và các module phải sử dụng chung GND.
+* RC522 bắt buộc sử dụng nguồn 3.3V.
+* Kiểm tra đúng thứ tự chân SDA, SCK, MOSI, MISO của RC522.
+* LCD I2C cần đấu đúng hai chân SDA và SCL.
+* LED phải có điện trở hạn dòng.
+* Không cấp trực tiếp điện áp 5V vào các chân GPIO của ESP32.
+* Nếu buzzer tiêu thụ dòng điện lớn, cần sử dụng transistor để điều khiển.
+* Kiểm tra toàn bộ dây nối trước khi cấp nguồn cho hệ thống.
+
+6. Kết luận
+
+Hệ thống sử dụng ESP32 làm bộ điều khiển trung tâm, kết hợp với module RFID RC522 để nhận diện thẻ, LCD 16x2 I2C để hiển thị thông tin, buzzer để phát âm thanh cảnh báo và LED để hiển thị trạng thái.
+
+Các linh kiện giao tiếp với ESP32 thông qua các giao thức SPI, I2C và GPIO. Hệ thống có thể ứng dụng trong mô hình kiểm soát ra vào, điểm danh RFID hoặc quản lý quyền truy cập.
